@@ -117,6 +117,13 @@ src/
 │   ├── arranger/   # Timeline Editor
 │   ├── mixer/      # Faders & Knobs
 │   └── sequencer/  # The Grid
+│   └── common/     # Shared UI (EnvironmentBanner)
 ├── store/          # State Management
 │   └── useProject.js
 └── main.jsx        # Entry point
+
+```
+
+```
+
+```
