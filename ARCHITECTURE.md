@@ -1,16 +1,21 @@
-```markdown
 # Nat's Rack Architecture Documentation
 
 > **Version:** 1.0.0
+>
 > **Last Updated:** 2026-01-04
+>
 > **Tech Stack:** React, Vite, Tone.js, Tailwind v4, Zustand, Firebase Hosting
 
+<br>
+
 ## 1. High-Level Overview
+
 Nat's Rack is a browser-based Digital Audio Workstation (DAW) designed with a "Rack" modular philosophy. It runs entirely client-side using the Web Audio API (via Tone.js) and uses LocalStorage for persistence.
 
 ---
 
 ## 2. Audio Engine Signal Flow
+
 The audio engine uses a **Parallel Processing** architecture. Each track has two distinct signal paths: a "Dry" path (the channel strip) and a "Wet" path (the reverb send).
 
 ```mermaid
@@ -27,7 +32,7 @@ graph LR
 
     subgraph "Master Bus"
         MST[Tone.Channel<br/>Master Vol]
-        LIM[Tone.Limiter<br/>Safety (-1dB)]
+        LIM[Tone.Limiter<br/>Safety -1dB]
         REC[Tone.Recorder<br/>Export]
         SPK((Speakers))
     end
@@ -117,6 +122,13 @@ src/
 │   ├── arranger/   # Timeline Editor
 │   ├── mixer/      # Faders & Knobs
 │   └── sequencer/  # The Grid
+│   └── common/     # Shared UI (EnvironmentBanner)
 ├── store/          # State Management
 │   └── useProject.js
 └── main.jsx        # Entry point
+
+```
+
+```
+
+```
