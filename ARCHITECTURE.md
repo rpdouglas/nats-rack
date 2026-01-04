@@ -48,7 +48,7 @@ graph LR
     MST --> LIM
     LIM --> REC
     LIM --> SPK
-...
+
 
 ### Key Audio Components:
 
