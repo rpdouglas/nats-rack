@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "nats-rack"
+  },
+  "targets": {
+    "nats-rack": {
+      "hosting": {
+        "prod": [
+          "nats-rack"
+        ],
+        "uat": [
+          "nats-rack-uat"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
