@@ -1,4 +1,3 @@
-```markdown
 # Nat's Rack Architecture Documentation
 
 > **Version:** 1.0.0
