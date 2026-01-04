@@ -1,3 +1,4 @@
+```markdown
 # Nat's Rack Architecture Documentation
 
 > **Version:** 1.0.0
@@ -49,6 +50,7 @@ graph LR
     LIM --> REC
     LIM --> SPK
 
+```
 
 ### Key Audio Components:
 
