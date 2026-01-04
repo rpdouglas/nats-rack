@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  /* Nat's Rack Professional Color Palette */
+  --color-rack-bg: #0a0a0a;
+  --color-rack-panel: #161616;
+  --color-neon: #00ff88;
+  --color-lcd-bg: #1a1f1a;
+  --color-lcd-text: #00ff88;
+  
+  /* Custom Spacing for the Grid */
+  --spacing-step: 4px;
+}
+
+@layer base {
+  body {
+    @apply bg-rack-bg text-white font-mono antialiased;
+    user-select: none; /* Prevents text selection while clicking the sequencer */
+  }
+}

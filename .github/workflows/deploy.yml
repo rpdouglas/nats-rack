@@ -1,0 +1,58 @@
+# 2026-01-04 PHASE 5: CI/CD PIPELINE
+# - Triggers 3-Tier Deployments:
+#   1. PR -> Preview Channel
+#   2. Merge to 'staging' -> UAT Site (nats-rack-uat)
+#   3. Merge to 'main' -> PROD Site (nats-rack)
+
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # DEPLOY PREVIEW (For PRs)
+      - name: Deploy Preview
+        if: github.event_name == 'pull_request'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_NATS_RACK }}'
+          projectId: nats-rack
+          expires: 7d
+
+      # DEPLOY UAT (Staging Branch)
+      - name: Deploy UAT
+        if: github.ref == 'refs/heads/staging'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_NATS_RACK }}'
+          projectId: nats-rack
+          channelId: live
+          target: uat
+
+      # DEPLOY PROD (Main Branch)
+      - name: Deploy PROD
+        if: github.ref == 'refs/heads/main'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_NATS_RACK }}'
+          projectId: nats-rack
+          channelId: live
+          target: prod

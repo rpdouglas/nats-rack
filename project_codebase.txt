@@ -1,0 +1,692 @@
+PROJECT EXPORT - 2026-01-04T14:07:11.501Z
+ENVIRONMENT: PRODUCTION_READY_V4.8 (Architectural Edition)
+NOTE: Includes Source Code, CI/CD Workflows, and Documentation.
+
+### DIRECTORY STRUCTURE ###
+├── .gitignore
+├── README.md
+├── eslint.config.js
+├── index.html
+├── package.json
+├── public
+│   ├── samples
+│   │   ├── clap.wav
+│   │   ├── clap.wav:Zone.Identifier
+│   │   ├── hihat.wav
+│   │   ├── hihat.wav:Zone.Identifier
+│   │   ├── kick.wav
+│   │   ├── kick.wav:Zone.Identifier
+│   │   ├── snare.wav
+│   │   └── snare.wav:Zone.Identifier
+│   └── vite.svg
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── audio
+│   │   └── Engine.js
+│   ├── features
+│   │   ├── common
+│   │   ├── mixer
+│   │   │   └── Mixer.jsx
+│   │   └── sequencer
+│   │       └── Sequencer.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   └── store
+│       └── useProject.js
+└── vite.config.js
+
+
+### SOURCE FILES ###
+
+--- START_FILE: README.md ---
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+--- END_FILE: README.md ---
+
+--- START_FILE: package.json ---
+{
+  "name": "nats-rack",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "lucide-react": "^0.562.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tone": "^15.1.22",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.2.4"
+  }
+}
+
+--- END_FILE: package.json ---
+
+--- START_FILE: vite.config.js ---
+/**
+ * GitHub Comment:
+ * Hardened Vite configuration for Remote Tunneling.
+ * Prevents port-climbing and ensures a single stable tunnel connection.
+ */
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
+ server: {
+    port: 8080, // Move to 8080
+    strictPort: true,
+    host: true
+  }
+  }
+)
+--- END_FILE: vite.config.js ---
+
+--- START_FILE: eslint.config.js ---
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+
+--- END_FILE: eslint.config.js ---
+
+--- START_FILE: index.html ---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nats-rack</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+--- END_FILE: index.html ---
+
+--- START_FILE: src/App.css ---
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+--- END_FILE: src/App.css ---
+
+--- START_FILE: src/App.jsx ---
+/**
+ * 2026-01-04 PHASE 1: COMPONENT UNIFICATION
+ * - Cleaned Shell Component.
+ * - Removed hard-coded grid logic.
+ * - Imports modular Sequencer and Mixer features.
+ */
+
+import React from 'react';
+import { useProject } from './store/useProject';
+import { engine } from './audio/Engine';
+import Mixer from './features/mixer/Mixer';
+import Sequencer from './features/sequencer/Sequencer';
+
+export default function App() {
+  const { isPlaying, setPlaying, bpm, setBpm } = useProject();
+
+  const handlePowerOn = async () => {
+    await engine.init();
+    console.log("Nat's Rack: System Initialized");
+  };
+
+  const handleTransport = () => {
+    if (isPlaying) {
+      engine.stop();
+      setPlaying(false);
+    } else {
+      engine.start();
+      setPlaying(true);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-rack-bg p-8 flex flex-col items-center">
+      
+      {/* HEADER UNIT */}
+      <header className="w-full max-w-4xl bg-rack-panel border-b-2 border-neon p-6 mb-8 flex justify-between items-center shadow-[0_0_20px_rgba(0,255,136,0.1)]">
+        <h1 className="text-neon text-3xl font-black tracking-tighter select-none">
+          NAT'S RACK
+        </h1>
+        
+        <div className="flex gap-6 items-center">
+          <button 
+            onClick={handlePowerOn} 
+            className="text-[10px] bg-zinc-800 px-3 py-1 rounded border border-zinc-600 hover:border-neon transition-colors text-zinc-400 font-bold tracking-wider"
+          >
+            PWR INIT
+          </button>
+
+          <div className="bg-lcd-bg px-4 py-1 border border-zinc-700 rounded flex flex-col items-center shadow-inner">
+            <span className="text-[8px] text-neon/60 uppercase font-bold self-start">Tempo</span>
+            <input 
+              type="number" 
+              value={bpm}
+              onChange={(e) => setBpm(Number(e.target.value))}
+              className="bg-transparent text-neon font-mono text-xl w-16 outline-none text-center"
+            />
+          </div>
+
+          <button 
+            onClick={handleTransport} 
+            className={`
+              px-8 py-2 rounded font-bold uppercase tracking-widest transition-all
+              ${isPlaying 
+                ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
+                : 'bg-neon text-black shadow-[0_0_15px_rgba(0,255,136,0.5)]'}
+            `}
+          >
+            {isPlaying ? 'Stop' : 'Play'}
+          </button>
+        </div>
+      </header>
+
+      {/* RACK STACK */}
+      <main className="w-full max-w-4xl space-y-6">
+        
+        {/* Module 1: Step Sequencer */}
+        <section>
+          <Sequencer />
+        </section>
+
+        {/* Module 2: Mixer */}
+        <section className="relative">
+          <span className="absolute top-2 left-4 text-[9px] text-zinc-600 uppercase tracking-widest z-10">
+            4-Channel Mixer
+          </span>
+          <Mixer />
+        </section>
+
+      </main>
+    </div>
+  );
+}
+--- END_FILE: src/App.jsx ---
+
+--- START_FILE: src/audio/Engine.js ---
+/**
+ * 2026-01-04 PHASE 1: COMPONENT UNIFICATION
+ * - Updated scheduling logic to read from 'timeline' and 'patterns'.
+ * - Calculates 'currentBar' to support Song Mode playback.
+ * - Retains Master Bus and Limiter logic.
+ */
+
+import * as Tone from 'tone';
+import { useProject } from '../store/useProject';
+
+class AudioEngine {
+  constructor() {
+    this.sampler = null;
+    this.reverb = null;
+    this.masterBus = null;
+    this.isInitialized = false;
+    this.isLoaded = false;
+  }
+
+  async init() {
+    if (this.isInitialized) return;
+
+    // 1. Audio Context & Master Bus
+    await Tone.start();
+    this.masterBus = new Tone.Limiter(-1).toDestination();
+
+    // 2. Global FX
+    this.reverb = new Tone.Reverb({
+      decay: 1.5,
+      wet: 0.1
+    }).connect(this.masterBus);
+
+    // 3. Sampler
+    this.sampler = new Tone.Players({
+      urls: {
+        Kick: "/samples/kick.wav",
+        Snare: "/samples/snare.wav",
+        HiHat: "/samples/hihat.wav",
+        Clap: "/samples/clap.wav",
+      },
+      onload: () => {
+        this.isLoaded = true;
+        console.log("Nat's Rack: Engine Ready. Pattern Mode Active.");
+        // Sync initial volumes
+        const { volumes } = useProject.getState();
+        volumes.forEach((db, idx) => this.updateVolume(idx, db));
+      },
+      onerror: (err) => console.error("Sample Load Error:", err)
+    }).connect(this.reverb);
+
+    this.isInitialized = true;
+  }
+
+  updateVolume(trackIdx, db) {
+    if (!this.sampler || !this.isInitialized) return;
+    const { tracks } = useProject.getState();
+    const trackName = tracks[trackIdx];
+    if (this.sampler.has(trackName)) {
+      this.sampler.player(trackName).volume.rampTo(db, 0.1);
+    }
+  }
+
+  start() {
+    if (!this.isLoaded) return;
+
+    const { bpm } = useProject.getState();
+    Tone.Transport.bpm.value = bpm;
+    Tone.Transport.cancel();
+
+    Tone.Transport.scheduleRepeat((time) => {
+      const state = useProject.getState();
+      
+      // --- NEW LOGIC STARTS HERE ---
+      // Calculate Position
+      // 16th notes per bar = 16
+      const totalSteps = Math.floor(Tone.Transport.ticks / Tone.Transport.PPQ * 4); 
+      const stepIndex = totalSteps % 16;
+      const barIndex = Math.floor(totalSteps / 16);
+
+      // Determine Active Pattern based on Timeline
+      // This allows us to chain patterns (A -> A -> B -> A)
+      const patternId = state.timeline[barIndex % state.timeline.length];
+      const patternGrid = state.patterns[patternId];
+
+      if (patternGrid) {
+        // Trigger Sounds from the specific pattern grid
+        patternGrid.forEach((row, trackIdx) => {
+          if (row[stepIndex]) {
+            const trackName = state.tracks[trackIdx];
+            this.sampler.player(trackName).start(time);
+          }
+        });
+      }
+      // --- NEW LOGIC ENDS HERE ---
+
+      // UI Sync
+      Tone.Draw.schedule(() => {
+        state.setCurrentStep(stepIndex);
+        state.setCurrentBar(barIndex % state.timeline.length);
+      }, time);
+
+    }, "16n");
+
+    Tone.Transport.start();
+  }
+
+  stop() {
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+    useProject.getState().setCurrentStep(0);
+    useProject.getState().setCurrentBar(0);
+  }
+}
+
+export const engine = new AudioEngine();
+--- END_FILE: src/audio/Engine.js ---
+
+--- START_FILE: src/features/mixer/Mixer.jsx ---
+/**
+ * GitHub Comment:
+ * Fixed TypeError by adding defensive checks for the volumes array.
+ * Ensures the Mixer only renders faders when state is fully initialized.
+ */
+
+import React from 'react';
+import { useProject } from '../../store/useProject';
+import { engine } from '../../audio/Engine';
+
+export default function Mixer() {
+  const { tracks, volumes, setVolume } = useProject();
+
+  // Safety check: If volumes isn't loaded yet, show a placeholder
+  if (!volumes || volumes.length === 0) {
+    return <div className="text-zinc-600 text-[10px] animate-pulse">INITIALIZING MIXER...</div>;
+  }
+
+  const handleVolumeChange = (idx, val) => {
+    const db = parseFloat(val);
+    setVolume(idx, db);
+    engine.updateVolume(idx, db);
+  };
+
+  return (
+    <div className="bg-rack-panel p-6 rounded-lg border border-zinc-800 flex gap-8 justify-center shadow-inner">
+      {tracks.map((track, idx) => {
+        // DEFENSIVE CHECK: Ensure we have a volume value for this index
+        const currentVol = volumes[idx] !== undefined ? volumes[idx] : -6;
+
+        return (
+          <div key={track} className="flex flex-col items-center gap-3">
+            <div className="h-32 w-8 bg-black rounded-sm relative flex justify-center border border-zinc-700 shadow-[inset_0_2px_10px_rgba(0,0,0,1)]">
+              <input 
+                type="range"
+                min="-60"
+                max="6"
+                step="1"
+                value={currentVol}
+                onChange={(e) => handleVolumeChange(idx, e.target.value)}
+                className="absolute w-28 h-2 cursor-pointer accent-neon -rotate-90 top-1/2"
+                style={{ transform: 'rotate(-90deg)', appearance: 'none' }}
+              />
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">{track}</span>
+              <span className="text-[9px] font-mono text-neon/80">{currentVol}dB</span>
+            </div>
+            
+            <div className={`w-1 h-1 rounded-full ${currentVol > -60 ? 'bg-neon shadow-[0_0_5px_#00ff88]' : 'bg-zinc-900'}`} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+--- END_FILE: src/features/mixer/Mixer.jsx ---
+
+--- START_FILE: src/features/sequencer/Sequencer.jsx ---
+/**
+ * 2026-01-04 PHASE 1: COMPONENT UNIFICATION
+ * - Fully migrated to Tailwind v4 (@theme variables).
+ * - Connected to 'activePatternId' and 'patterns' store slice.
+ * - Removed legacy style objects.
+ */
+
+import React from 'react';
+import { useProject } from '../../store/useProject';
+
+export default function Sequencer() {
+  const { 
+    tracks, 
+    patterns, 
+    activePatternId, 
+    currentStep, 
+    toggleStep 
+  } = useProject();
+
+  // Guard Clause: Ensure pattern data exists before rendering
+  const grid = patterns[activePatternId];
+  if (!grid) return <div className="text-zinc-500">Pattern Load Error</div>;
+
+  return (
+    <div className="bg-rack-panel p-8 rounded-lg border border-zinc-800 relative shadow-inner">
+      {/* Module Header */}
+      <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-2">
+        <span className="text-[9px] text-zinc-500 uppercase tracking-widest">
+          Step Sequencer <span className="text-neon/50">:: {activePatternId}</span>
+        </span>
+        <div className="flex gap-2">
+          {/* Pattern Selector Stub (Visual only for Phase 1) */}
+          <div className="text-[9px] text-neon bg-lcd-bg px-2 py-1 rounded font-mono">
+            PTRN: {activePatternId}
+          </div>
+        </div>
+      </div>
+      
+      {/* Grid Container */}
+      <div className="flex flex-col gap-3">
+        {tracks.map((track, trackIdx) => (
+          <div key={track} className="flex items-center gap-4">
+            
+            {/* Track Label */}
+            <div className="w-20 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right">
+              {track}
+            </div>
+
+            {/* Step Row */}
+            <div className="flex gap-1">
+              {grid[trackIdx].map((active, stepIdx) => {
+                const isCurrent = currentStep === stepIdx;
+                
+                return (
+                  <div
+                    key={stepIdx}
+                    onClick={() => toggleStep(trackIdx, stepIdx)}
+                    className={`
+                      w-8 h-10 sm:w-10 sm:h-12 rounded-sm cursor-pointer transition-all duration-75
+                      border
+                      ${active 
+                        ? 'bg-neon shadow-[0_0_10px_var(--color-neon)] border-neon' 
+                        : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'}
+                      ${isCurrent 
+                        ? 'border-white brightness-125' 
+                        : 'opacity-100'}
+                    `}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer / Step Indicators */}
+      <div className="flex gap-1 ml-24 mt-4">
+        {Array(16).fill(0).map((_, i) => (
+          <div 
+            key={i} 
+            className={`
+              w-8 sm:w-10 text-center text-[9px] font-mono transition-colors
+              ${currentStep === i ? 'text-neon font-bold' : 'text-zinc-700'}
+            `}
+          >
+            {String(i + 1).padStart(2, '0')}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+--- END_FILE: src/features/sequencer/Sequencer.jsx ---
+
+--- START_FILE: src/index.css ---
+@import "tailwindcss";
+
+@theme {
+  /* Nat's Rack Professional Color Palette */
+  --color-rack-bg: #0a0a0a;
+  --color-rack-panel: #161616;
+  --color-neon: #00ff88;
+  --color-lcd-bg: #1a1f1a;
+  --color-lcd-text: #00ff88;
+  
+  /* Custom Spacing for the Grid */
+  --spacing-step: 4px;
+}
+
+@layer base {
+  body {
+    @apply bg-rack-bg text-white font-mono antialiased;
+    user-select: none; /* Prevents text selection while clicking the sequencer */
+  }
+}
+--- END_FILE: src/index.css ---
+
+--- START_FILE: src/main.jsx ---
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+--- END_FILE: src/main.jsx ---
+
+--- START_FILE: src/store/useProject.js ---
+/**
+ * 2026-01-04 PHASE 1: COMPONENT UNIFICATION
+ * - Refactored state to support Pattern-Based Architecture (Option B).
+ * - Replaced flat 'grid' with 'patterns' dictionary and 'timeline' array.
+ * - Added 'activePatternId' for UI editing context.
+ */
+
+import { create } from 'zustand';
+
+// Helper to create a blank 4-track x 16-step grid
+const createGrid = () => Array(4).fill(null).map(() => Array(16).fill(false));
+
+export const useProject = create((set) => ({
+  // Transport State
+  bpm: 120,
+  isPlaying: false,
+  currentStep: 0,
+  currentBar: 0,
+
+  // Project Data
+  tracks: ['Kick', 'Snare', 'HiHat', 'Clap'],
+  volumes: [-6, -6, -6, -6], // Decibels
+
+  // Pattern Architecture
+  activePatternId: 'A', // The pattern currently being edited in the UI
+  timeline: ['A'],      // The arrangement of patterns (Song Mode)
+  patterns: {
+    'A': createGrid(),
+    'B': createGrid(), // Pre-allocate B for future use
+  },
+
+  // Actions
+  setBpm: (bpm) => set({ bpm }),
+  setPlaying: (isPlaying) => set({ isPlaying }),
+  setCurrentStep: (currentStep) => set({ currentStep }),
+  setCurrentBar: (currentBar) => set({ currentBar }),
+  
+  // Volume Action (Restored from previous phase)
+  setVolume: (trackIdx, value) => set((state) => {
+    const newVolumes = [...state.volumes];
+    newVolumes[trackIdx] = value;
+    return { volumes: newVolumes };
+  }),
+
+  // Toggle Step Logic (Updated for Pattern Dictionary)
+  toggleStep: (trackIdx, stepIdx) => set((state) => {
+    const patternId = state.activePatternId;
+    const currentGrid = state.patterns[patternId];
+    
+    // Deep clone the specific row to avoid mutation
+    const newGrid = currentGrid.map((row, i) => 
+      i === trackIdx ? row.map((step, j) => j === stepIdx ? !step : step) : row
+    );
+
+    return {
+      patterns: {
+        ...state.patterns,
+        [patternId]: newGrid
+      }
+    };
+  }),
+
+  // Pattern Management
+  setActivePattern: (patternId) => set({ activePatternId: patternId }),
+}));
+--- END_FILE: src/store/useProject.js ---
